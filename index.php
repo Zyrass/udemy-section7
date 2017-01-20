@@ -461,18 +461,113 @@
                     <p>Les informations de ma connexion ne seront ici pas visible mais pour information il faut saisir l'identifiant le mdp ainsi que le serveur auquel on se connecte.</p>
                     <?php
                         include ('connexion.php');
+
+                        $resultat = $bdd->query('SELECT first_name FROM customers');
+
+                        while ( $row = $resultat->fetch()) {
+                            echo $row['first_name']. '<br />';
+                        }
+                        echo '<hr>';
+
+                        $marjorie = $bdd->query('SELECT name, description, price FROM products');
+
+                        while ( $row = $marjorie->fetch()) {
+                            echo '<p>'. $row['name'] . ' dispose comme description <mark>' . $row['description']. '</mark> et son prix est de : ' . $row['price'] . ' €.</p>';
+                        }
                     ?>
+                   
                 </fieldset>
                 <h3>fonction query</h3>
                 <fieldset>
                     <legend>fonction query</legend>
+                    <p>la fonction query qui veut dire requête en français, permet en php d'écrire nos reqûetes SQL. Un requête vient après une connexion à notre bdd.</p>
+                    <h4>FETCH()</h4>
+                    <p>fetch() permet de récupérer une ligne.</p>
+                    <pre>
+                    &lt;?php
+
+                        // Code accès à la bdd ici...
+
+                        $myResult = $bdd->query(" REQUETE SQL ICI ");
+                        $myResult->fetch();
+
+                        var_dump($myResult->fetch());
+                    ?&gt;
+                    </pre>
+                    <p>pour voir le contenu d'une variable spécifique, on peut faire un var_dump($myResult->fetch()) ce qui afficherai tout même les index.</p>
+                    <p>Même chose avec la possibilité d'utiliser PDO pour restreindre l'affichage dans notre var_dump.</p>
+                    <pre>
+                        var_dump($myResult->fetch(PDO::FETCH_ASSOC));
+                    </pre>
+                    <p>Pour obtenir le même résultat avec uniquement les index dans le var_dump, il faut saisir :</p>
+                    <pre>
+                        var_dump($myResult->fetch(PDO::FETCH_NUM));
+                    </pre>
+                    <h4>FETCHALL()</h4>
+                    <p>fetchall() permet de récupérer toutes les lignes.</p>
+                    <pre>
+                    &lt;?php
+
+                        // Code accès à la bdd ici...
+
+                        $myResult = $bdd->query(" REQUETE SQL ICI ");
+                        $myResult->fetchall();
+
+                        var_dump($myResult->fetchall());
+                    ?&gt;
+                    </pre>
+                    <p>Affiché les lignes une à une avec la boucle while()</p>
+                    <p>2 Possibilités, en 1 on créer la variable et on définit le fetch dans cette même variable. Puis dans le while on appel la variable. Sinon la 2ème possibilité, c'est de saisir sirectement la variable avec le fetch dans le while.</p>
+                    <h4>Exemple 1</h4>
+                    <pre>
+                    &lt;?php
+                        $row = $myResult->fetch();
+
+                        while ($row) {
+                            // code ici...
+                            $row = $myResult->fetch();
+                        }
+                    ?&gt;
+                    </pre>
+                    <h4>Exemple 2</h4>
+                    <pre>
+                    &lt;?php
+                        while ($row = $myResult->fetch()) {
+                            // code ici...
+                        }
+                    ?&gt;
+                    </pre>
+                    <p>Il est aussi possible d'insérer une donnée directement, sans forcément voir le résultat à l'écran</p>
+                    <pre>
+                    &lt;?php
+                        $bdd->query('INSERT INTO customers(first_name, last_name) VALUES (\'Walt\', \'Disney\')');
+                    ?&gt;
+                    </pre>
                 </fieldset>
                 <h3>fonction prepare et execute</h3>
                 <fieldset>
-                    <legend>fonction prepare</legend>
+                    <legend>fonction prepare & execute</legend>
+                    <p>la fonction prepare permet de préparer une requête. En gros on ne sait pas forcément quelle donnée sera renseigné.. Quant à la fonction execute, elle permet d'exécuter une requete qui aura été préparer...</p>
+                    <pre>
+                    &lt;?php
+                        $ask->prepare('INSERT INTO customers (first_name, last_name) VALUES (?,?)')
+                    ?&gt;
+                    </pre>
+                    <p>Puis pas mal de chose se passe et là les valeurs arrivent.</p>
+                    <pre>
+                        $firstName = "Willy";
+                        $lastName = "Rovelly";
+                    </pre>
+                    <p>Enfin on exécute les valeurs qui auront été insérer dans nos variables.</p>
+                    <pre>
+                    &lt;?php
+                        $ask->execute(array($firstName,$lastName));
+                    ?&gt;
+                    </pre>
                 </fieldset>
                 <fieldset>
                     <legend>fonction execute</legend>
+                    <p></p>
                 </fieldset>
             </article>
         </section>
