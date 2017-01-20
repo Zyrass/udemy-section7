@@ -182,12 +182,140 @@
                 <h3>SQL : JOIN</h3>
                 <fieldset>
                     <legend>SQL : JOIN</legend>
-                    <p>JOIN : JOIN permet de créer des jointures entre les tables. En gros nous pouvons lié par exemple 2 tables entres elles.</p>
+                    <p>JOIN : JOIN permet de créer des jointures entre les tables. En gros nous pouvons lié par exemple 2 tables entres elles. Au préalable, il faut créer un champ qui sera la clé étrangère qui nous permettra de faire la relation.</p>
+                    <p>Les jointures sont assez complexe à comprendre. En somme imaginons que l'on recherche le nom d'un produit ainsi que son type. Sauf que chacune de ces informations est inscrite dans une table indépendante. Pour réaliser la jointure, on sélectionnera la table suivi d'un point puis le nom du champ pour la première table. On indiquera ensuite une virgule et on sélectionnera la seconde table suivit également d'un point et du nom du champ à afficher. On désigne ou es-ce que l'on veut voir l'opération avec le FROM exemple product_categories puis, on y ajoute les mots clé INNER JOIN. On indique une autre table (ex : products) puis à nouveau on utilise un autre mot clé ON ou l'on spécifie notre première table suivi d'un point est égale à notre autre table point le champ ou se trouve notre clé étrangère. Quatre exemple avec des utilisations de plusieurs choses qui ont été vu.</p>
+                    <h4>INNER JOIN</h4>
+                    <p>Si une par exemple une catégorie de produit ne comporte aucun produit, cette catégorie ne sera pas visible.</p>
+                    <pre>
+                        SELECT product_categories.name, products.name
+                        FROM product_categories
+                        INNER JOIN products
+                        ON product_categories.id = products.category;
+                    </pre>
+                    <h4>LEFT JOIN</h4>
+                    <p>Avec LEFT si une catégorie ne comporte pas de produit, celle-ci sera tout de même afficher avec pour résultat NULL dans la désignation du produit.</p>
+                    <pre>
+                        SELECT product_categories.name, products.name
+                        FROM product_categories /* Cette table qui prime avec LEFT */
+                        LEFT JOIN products
+                        ON product_categories.id = products.category;
+                    </pre>
+                    <h4>RIGHT JOIN</h4>
+                    <p>Avec RIGHT, si nous voulons afficher tous les produits mêmes ceux qui ne comporte pas de catégorie, se sera possible des les affiche. Le champ catégorie aura comme valeur NULL</p>
+                    <pre>
+                        SELECT product_categories.name, products.name
+                        FROM product_categories
+                        RIGHT JOIN products /* Cette table qui prime avec RIGHT */
+                        ON product_categories.id = products.category;
+                    </pre>
+                    <h4>Un ALIAS avec les JOINTURE</h4>
+                    <p>Les ALIAS nous facilite grandement la tâche en réduisant le nombre de caractère à saisir. Reprenons le premier exemple modifié avec des ALIAS :</p>
+                    <pre>
+                        SELECT pc.name, p.name
+                        FROM product_categories AS pc /* pc pour product_categories */
+                        INNER JOIN products AS p /* p pour products */
+                        ON pc.id = p.category;
+                    </pre>
+                    <p>Tout fonctionne très bien sauf que le soucis c'est que nos 2 champs porte le même nom. On a le nom de la catégorie et le nom du produit. Pour arrangé ça on reprendre la même syntaxe que précédemment avec l'ajout d'un alias pour désigner le nouveau nom de nos champ :</p>
+                    <pre>
+                        SELECT pc.name AS categoryName, p.name AS productsName
+                        FROM product_categories AS pc
+                        INNER JOIN products AS p
+                        ON pc.id = p.category;
+                    </pre>
+                    
                 </fieldset>
                 <h3>SQL : DATE</h3>
                 <fieldset>
                     <legend>SQL : DATE</legend>
-                    <p>DATE : </p>
+                    <p>Les dates sont très importante dans nos bdd, elles permettent de définir un instant précis lors d'un enregistrement d'un produit, d'une inscription etc.. Plusieurs déclinaisons existe :</p>
+                    <dl>
+                        <dt>DATE</dt>
+                        <dd>C'est la date : Mois / jour / année</dd>
+                    </dl>
+                    <dl>
+                        <dt>DATETIME</dt>
+                        <dd>C'est la date et un temps dans la journée. Mois / jour / année / secondes / minutes / heures.</dd>
+                    </dl>
+                    <dl>
+                        <dt>TIMESTAMP</dt>
+                        <dd>C'est la même chose que datetime</dd>
+                    </dl>
+                    <dl>
+                        <dt>TIME</dt>
+                        <dd>C'est uniquement un temps. Seconde / minutes / heures</dd>
+                    </dl>
+                    <dl>
+                        <dt>YEAR</dt>
+                        <dd>C'est l'année</dd>
+                    </dl>
+                    <dl>
+                        <dt>NOW</dt>
+                        <dd>C'est maintenant.</dd>
+                    </dl>
+                    <p>Exemple d'une requete SQL permettant d'afficher une date spécifique qui aura été récupérer dans la bdd</p>
+                    <pre>
+                        SELECT first_name, last_name, join_date 
+                        FROM customers
+                        WHERE join_date = "2014-02-20 21:07:19";
+                    </pre>
+                    <p>Autre exemple avec un interval qui nous permettrait de retrouver tous les membres qui se sont connecté à une heure spécifique.</p>
+                    <pre>
+                        SELECT first_name, last_name, join_date
+                        FROM customers
+                        WHERE join_date >= "2014-02-20 02:00:00"
+                        AND join_date <= "2014-02-21 12:00:00";
+                    </pre>
+                    <p>Nous pouvons avec le mot clé BETWEEN qui signifie entre indiqué la même requête écrite donc différemment.</p>
+                    <pre>
+                        SELECT first_name, last_name, join_date
+                        FROM customers
+                        WHERE join_date BETWEEN "2014-02-20 02:00:00"
+                        AND "2014-02-21 12:00:00";
+                    </pre>
+                    <p>Un exemple avec une fonction qui nous permettra d'afficher uniquement l'année au lieu de toutes les informations</p>
+                    <pre>
+                        SELECT first_name, last_name, YEAR(join_date) AS yearDate
+                        FROM customers
+                        WHERE join_date BETWEEN "2014-02-20 02:00:00"
+                        AND "2014-02-21 12:00:00";
+                    </pre>
+                    <p>Exemple d'une fonction pour afficher le mois</p>
+                    <pre>
+                        SELECT first_name, last_name, MONTH(join_date) AS monthDate
+                        FROM customers
+                        WHERE join_date BETWEEN "2014-02-20 02:00:00"
+                        AND "2014-02-21 12:00:00";
+                    </pre>
+                    <p>Exemple avec la fonction DAY()</p>
+                    <pre>
+                        SELECT first_name, last_name, DAY(join_date) AS dayDate
+                        FROM customers
+                        WHERE join_date BETWEEN "2014-02-20 02:00:00"
+                        AND "2014-02-21 12:00:00";
+                    </pre>
+                    <p>Même exemple avec un mixte de plusieurs fonctions : HOUR(), MINUTE(), SECOND()</p>
+                    <pre>
+                        SELECT first_name, last_name, HOUR(join_date) AS hourDate, MINUTE(join_date) AS minuteDate, SECOND(join_date) AS secondDate
+                        FROM customers
+                        WHERE join_date BETWEEN "2014-02-20 02:00:00"
+                        AND "2014-02-21 12:00:00";
+                    </pre>
+                    <p>Exemple avec le TIMESTAMP()</p>
+                    <pre>
+                        SELECT first_name, last_name, TIMESTAMP(join_date) AS timestamp
+                        FROM customers
+                        WHERE join_date BETWEEN "2014-02-20 02:00:00"
+                        AND "2014-02-21 12:00:00";
+                    </pre>
+                    <p>Exemple avec la fonction maintenant.</p>
+                    <pre>
+                        SELECT first_name, last_name, NOW() AS now
+                        FROM customers
+                        WHERE join_date;
+                    </pre>
+
+
                 </fieldset>
                 <h3>SQL : FUNCTIONS</h3>
                 <fieldset>
