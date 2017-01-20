@@ -314,22 +314,99 @@
                         FROM customers
                         WHERE join_date;
                     </pre>
-
-
                 </fieldset>
                 <h3>SQL : FUNCTIONS</h3>
                 <fieldset>
                     <legend>SQL : FUNCTIONS</legend>
-                    <p>FUNTIONS :</p>
+                    <p>FUNCTIONS :</p>
+                    <h4>AVG() - average soit la moyenne</h4>
+                    <p>Avec cette fonction il est possible de faire une moyenne d'un champ. Par exemple les prix.</p>
+                    <pre>
+                        SELECT AVG(price) AS moyennePrix
+                        FROM products;
+                    </pre>
+                    <p>Dans l'exemple qui suit, on va sélectionner tous les éléments don le prix est supérieur à la moyenne de ce même champ.</p>
+                    <pre>
+                        /* Pour rappel, la moyenne est actuellement de 176.5 */
+                        SELECT *
+                        FROM products
+                        WHERE price > (SELECT AVG(price) FROM products);
+                    </pre>
+                    <h4>COUNT() - compter une quantité</h4>
+                    <p>La fonction count() permet de compter le nombre de ligne qui correspond à la requête demandé.</p>
+                    <pre>
+                        SELECT COUNT(name) AS quantité
+                        FROM products;
+                    </pre>
+                    <h4>COUNT(DISTINCT xxxxx)</h4>
+                    <p>Cette fonction permet de compter uniquement des champ distinct et non le nombre total de ligne qui ont été enregistrer. Si un enregistrement revient une seconde fois, il sera ignoré.</p>
+                    <pre>
+                        SELECT COUNT(DISTINCT price) AS prixDistinct
+                        FROM products;
+                    </pre>
+                    <p>Il est également possible de compter un certain nombre d'article selon une catégorie spécifique. Exemple on va compter toutes les catégorie qui sont différente de 1</p>
+                    <pre>
+                        SELECT COUNT(category) AS nbCategory
+                        FROM products
+                        WHERE category != 1;
+                    </pre>
+                    <h4>MAX() & MIN()</h4>
+                    <p>La fonction MAX return le nombre maximal qui aura été saisi. En revanche la fonction MIN fera l'inverse.</p>
+                    <pre>
+                        /* PRIX MAX */
+                        SELECT name, MAX(price)
+                        FROM products;
+                    </pre>
+                    <pre>
+                        /* PRIX MIN */
+                        SELECT name, MIN(price)
+                        FROM products;
+                    </pre>
                 </fieldset>
                 <h3>SQL : GROUP BY et HAVING</h3>
                 <fieldset>
                     <legend>SQL : GROUP BY</legend>
                     <p>GROUP BY : permet de regrouper des éléments par ce qu'on aura spécifier.</p>
+                    <p>Exemple on va spécifier la moyenne des produit groupé par categorie.</p>
+                    <pre>
+                        SELECT category, AVG(price) AS moyennePrix
+                        FROM products
+                        GROUP BY category;
+                    </pre>
+                    <p>Même exemple sauf qu'on compte également le nombre de produit dans ma table products.</p>
+                    <pre>
+                        SELECT category, COUNT(category) AS nbCategorie, AVG(price) AS moyennePrix
+                        FROM products
+                        GROUP BY category;
+                    </pre>
+                    <p>Même exemple tout en spécifiant le nom de la category</p>
+                    <pre>
+                        SELECT product_categories.name, AVG(products.price) AS average_prince
+                        FROM products
+                        INNER JOIN product_categories
+                        ON product_categories.id = products.category
+                        GROUP BY product_categories.name;
+                    </pre>
+                    <p>Spécifions des ALIAS pour alléger la syntaxe</p>
+                    <pre>
+                        SELECT pc.name, AVG(p.price) AS average_price
+                        FROM products AS p
+                        INNER JOIN product_categories AS pc
+                        ON pc.id = p.category
+                        GROUP BY pc.name;
+                    </pre>
                 </fieldset>
                 <fieldset>
                     <legend>SQL : HAVING</legend>
-                    <p>HAVING : permet de spécifier un élément si il dispose de tel ou tel contenu.</p>
+                    <p>HAVING : permet après un groupement de spécifier une requête plus précise. Reprenons l'exemple précédent en y ajoutant le HAVING() dont la moyenne sera supérieur à 100</p>
+                    <pre>
+                        SELECT pc.name, AVG(p.price) AS average_price
+                        FROM products AS p
+                        INNER JOIN product_categories AS pc
+                        ON pc.id = p.category
+                        GROUP BY pc.name
+                        HAVING average_price > 100;
+                    </pre>
                 </fieldset>
             </article>
 
@@ -339,14 +416,52 @@
                 <h3>PDO ou MySQLi</h3>
                 <fieldset>
                     <legend>PDO</legend>
+                    <p>PDO est supportée par PHP7 et il est compatible avec tous les SGBDD disponible. Pourquoi s'en priver ?</p>
+                    <p>PDO étant un module de php il peut arriver qu'il ne soit pas activer par défaut. Pour celà il faut ouvrir Php.ini et retirer le " ; " de la ligne :</p>
+                    <pre>
+                        extension=php_pdo_mysql.dll
+                    </pre>
                 </fieldset>
                 <fieldset>
                     <legend>MySQLi</legend>
+                    <p>Encore supporté aujourd'hui par PHP7. mysqli_ communique UNIQUEMENT avec MySQL...</p>
                 </fieldset>
-                <h3>Connexion à une base de données</h3>
+                <h3>Connexion à une base de données LOCAL</h3>
                 <fieldset>
                     <legend>Connexion à une base de données</legend>
-                    <p>Voici le code généralement utiliser pour se connecter à une base de donnée. Localhost pour une base de donnée spécifiquement disponible en local.</p>
+                    <p>Voici le code généralement utiliser pour se connecter à une base de donnée en local.</p>
+                    <pre>
+                        &lt;?php
+                            $bdd = new PDO('mysql:host=localhost;dbname=store','identifiant','password');
+                        ?&gt;
+                    </pre>
+                    <p>Si on spécifie un mauvais identifiant ou mot de passe, le risque sera grand dans le senso u nos informations seront visible en ligne... Dans notre cas précédent nous aurions obtenu :</p>
+                    <p>
+                        <img src="http://puu.sh/tsW08/81d015124d.png" alt="erreur code afficher">
+                    </p>
+                    <p>Sur ce coup ce n'est pas intéressant vu qu'on apperçoit directement l'identifiant ainsi que le mot de passe saisi... </p>
+                    <p>Pour contrer tout ça, il est possible d'essayer une tentative et si une erreur existe, elle sera capturer sans dévoiler le mot de passe. Pour celà on utilise les blocs TRY {}CATCH {}</p>
+                    <pre>
+                        &lt;?php
+                            
+                            try {
+                                $bdd = new PDO ('mysql:host=localhost;dbname=store','identifiant', "password");
+                            } catch(Exception $error) {
+                                die('Erreur : '. $error->getMessage());
+                            }
+                        ?&gt;
+                    </pre>
+                    <p>L'erreur affichera : <br />
+                    <img src="http://puu.sh/tsXHv/d148309398.png" alt=""></p>
+                </fieldset>
+                <h3>Connexion à une base de données en LIGNE</h3>
+                <fieldset>
+                    <legend>Connexion à une base de données</legend>
+                    <p>Pour spécifier une bdd en ligne, il faut créer un utilisateur, lui spécifier les droits, ensuite nous devons l'ajouter à notre sgbdd. Par la suite on créer une table et on importe un fichier sql ou bien on le créer depuis le début.</p>
+                    <p>Les informations de ma connexion ne seront ici pas visible mais pour information il faut saisir l'identifiant le mdp ainsi que le serveur auquel on se connecte.</p>
+                    <?php
+                        include ('connexion.php');
+                    ?>
                 </fieldset>
                 <h3>fonction query</h3>
                 <fieldset>

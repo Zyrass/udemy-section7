@@ -1,0 +1,2 @@
+# Ignore le fichier de connexion à la base de donnée en ligne
+/connexion.php
