@@ -574,7 +574,7 @@
         
         <footer>
             <p>Alain tous droits réserver</p>
-        </footer>
+        </footer>              
 
 
     </body>
